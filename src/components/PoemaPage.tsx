@@ -4,9 +4,9 @@ import { createTimeline } from 'animejs';
 const VERSES = [
   "Falam as lendas que uma pantera vive aqui.",
   "Longe de todo o mal,",
-  "O chão do banheiro tremeu com seus gritos.",
+  "O chão do banheiro tremeu com teus gritos.",
   "Risos se tornaram desespero ao ver os olhos da pantera,",
-  "Em seu rosto.",
+  "Em teu rosto.",
   "Suas palavras são facadas em meu peito.",
   "Tuas risadas são bolhas de ar no seu oceano.",
   "Apareça, pantera.",

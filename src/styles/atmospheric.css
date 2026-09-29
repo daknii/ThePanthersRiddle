@@ -1,0 +1,110 @@
+/* Atmospheric & Cryptic Horror Styles */
+
+:root {
+  --bg-void: #050303;
+  --crimson-accent: #990011;
+  --crimson-glow: #e6001a;
+  --crimson-faint: rgba(140, 5, 15, 0.15);
+
+  /* Clean, slow cinematic easing tokens */
+  --ease-cinematic: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-smooth-fade: cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+/* Force eliminate scrollbars across all viewports */
+html, body {
+  width: 100vw;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+  overflow: hidden !important;
+  background-color: var(--bg-void);
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Cursor Rules: Keep default on puzzle canvas, allow text selection on binary block */
+*:not(.binary-selectable):not(.binary-selectable *) {
+  cursor: default !important;
+}
+
+/* Binary Text Explicit Selection Support */
+.binary-selectable {
+  user-select: text !important;
+  -webkit-user-select: text !important;
+  -moz-user-select: text !important;
+  -ms-user-select: text !important;
+  cursor: text !important;
+}
+
+.binary-selectable::selection,
+.binary-selectable *::selection {
+  background-color: rgba(230, 0, 26, 0.55) !important;
+  color: #ffffff !important;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.8) !important;
+}
+
+/* Subtle Crimson Vignette Layer */
+.vignette-crimson {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse at 50% 50%,
+    transparent 42%,
+    rgba(60, 5, 10, 0.16) 78%,
+    rgba(5, 3, 3, 0.96) 100%
+  );
+  z-index: 10;
+  transition: opacity 1.8s var(--ease-smooth-fade);
+}
+
+/* Analog Noise / Film Grain */
+.noise-overlay {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image: radial-gradient(rgba(180, 20, 30, 0.035) 1px, transparent 0);
+  background-size: 20px 20px;
+  opacity: 0.75;
+  z-index: 11;
+}
+
+/* Panther Eye Subtle Tracking: Damped, silky smooth feline tracking */
+.panther-pupil {
+  transform-origin: center;
+  transition: transform 0.42s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform;
+}
+
+/* Smooth Eyelid Blend Masking */
+.eyelid-rect {
+  will-change: transform;
+}
+
+/* Fullscreen Resolution Fade Overlay */
+.resolution-fade-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: #050303;
+  pointer-events: none;
+  z-index: 40;
+  opacity: 0;
+  transition: opacity 2.4s var(--ease-smooth-fade);
+}
+
+.resolution-fade-overlay.active {
+  opacity: 1;
+}
+
+/* Reduced Motion Compliance */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

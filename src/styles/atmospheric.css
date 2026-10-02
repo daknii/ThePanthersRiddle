@@ -100,6 +100,86 @@ html, body {
   opacity: 1;
 }
 
+/* Red Signal Beacon & Radar Emitter Effects (Target Lock) */
+@keyframes signalRingWave {
+  0% {
+    r: 6px;
+    opacity: 0.95;
+    stroke-width: 2px;
+  }
+  50% {
+    opacity: 0.65;
+  }
+  100% {
+    r: 30px;
+    opacity: 0;
+    stroke-width: 0.5px;
+  }
+}
+
+@keyframes signalCorePulse {
+  0%, 100% {
+    transform: scale(0.92);
+    opacity: 0.85;
+    filter: drop-shadow(0 0 6px #ff002b) drop-shadow(0 0 14px #ff002b);
+  }
+  50% {
+    transform: scale(1.25);
+    opacity: 1;
+    filter: drop-shadow(0 0 12px #ff2b4f) drop-shadow(0 0 28px #ff0033);
+  }
+}
+
+@keyframes signalSlitPulse {
+  0%, 100% {
+    stroke-width: 2px;
+    opacity: 0.8;
+  }
+  50% {
+    stroke-width: 3.5px;
+    opacity: 1;
+  }
+}
+
+@keyframes eyeSignalGlow {
+  0%, 100% {
+    opacity: 0.35;
+    transform: scale(1.15);
+  }
+  50% {
+    opacity: 0.65;
+    transform: scale(1.4);
+  }
+}
+
+.animate-signal-ring-1 {
+  animation: signalRingWave 1.4s cubic-bezier(0.2, 0.8, 0.4, 1) infinite;
+  transform-origin: 120px 60px;
+}
+
+.animate-signal-ring-2 {
+  animation: signalRingWave 1.4s cubic-bezier(0.2, 0.8, 0.4, 1) infinite 0.45s;
+  transform-origin: 120px 60px;
+}
+
+.animate-signal-ring-3 {
+  animation: signalRingWave 1.4s cubic-bezier(0.2, 0.8, 0.4, 1) infinite 0.9s;
+  transform-origin: 120px 60px;
+}
+
+.animate-signal-glow {
+  animation: signalCorePulse 1.1s ease-in-out infinite;
+  transform-origin: 120px 60px;
+}
+
+.animate-signal-slit {
+  animation: signalSlitPulse 1.1s ease-in-out infinite;
+}
+
+.animate-eye-signal-aura {
+  animation: eyeSignalGlow 1.8s ease-in-out infinite;
+}
+
 /* Reduced Motion Compliance */
 @media (prefers-reduced-motion: reduce) {
   * {

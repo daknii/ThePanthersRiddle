@@ -3,21 +3,22 @@ import type { ProximityState, BlinkState } from '../types/puzzle';
 
 interface UseBlinkManagerProps {
   proximityState: ProximityState;
+  distance?: number;
   forceClosed?: boolean;
   enabled?: boolean;
 }
 
 /**
  * Custom Hook: Blink State Management
- * Controls the realistic, smooth blinking patterns of the red panther eyes based on proximity:
- * - FAR: Barely reacts (infrequent, slow natural blinks)
- * - GETTING_CLOSER: One eye starts blinking periodically
- * - CLOSER: Both eyes blink asynchronously
- * - VERY_CLOSE: Eyes blink alternately (ping-pong cadence)
- * - INSIDE_TARGET: Final proximity state (predatory lock, wide open, hyper-focused)
+ * Dynamically accelerates blinking frequency as the user approaches the hidden target:
+ * - FAR: Infrequent, slow feline double-blinks (~3.5s - 5s).
+ * - CLOSER: Blinking intervals progressively speed up (3s -> 1.8s -> 900ms -> 450ms).
+ * - VERY CLOSE: Rapid alternating ping-pong flutter (~200ms - 300ms).
+ * - INSIDE TARGET: Complete freeze! All blinking STOPS immediately, eyes lock wide open.
  */
 export function useBlinkManager({
   proximityState,
+  distance = Infinity,
   forceClosed = false,
   enabled = true,
 }: UseBlinkManagerProps) {
@@ -27,13 +28,28 @@ export function useBlinkManager({
   });
 
   const activeTimersRef = useRef<number[]>([]);
+  const nextEyeRef = useRef<'left' | 'right'>('left');
+  const distanceRef = useRef(distance);
+  const proximityRef = useRef(proximityState);
+  const enabledRef = useRef(enabled);
+  const forceClosedRef = useRef(forceClosed);
+
+  // Keep refs synchronized
+  useEffect(() => {
+    distanceRef.current = distance;
+    proximityRef.current = proximityState;
+    enabledRef.current = enabled;
+    forceClosedRef.current = forceClosed;
+  }, [distance, proximityState, enabled, forceClosed]);
 
   const clearAllTimers = useCallback(() => {
     activeTimersRef.current.forEach((id) => clearTimeout(id));
     activeTimersRef.current = [];
   }, []);
 
-  const blinkEye = useCallback((eye: 'left' | 'right' | 'both', durationMs = 280) => {
+  const blinkEye = useCallback((eye: 'left' | 'right' | 'both', durationMs = 240) => {
+    if (proximityRef.current === 'INSIDE_TARGET' || forceClosedRef.current) return;
+
     setBlinkState((prev) => ({
       leftEyeClosed: eye === 'left' || eye === 'both' ? true : prev.leftEyeClosed,
       rightEyeClosed: eye === 'right' || eye === 'both' ? true : prev.rightEyeClosed,
@@ -53,95 +69,94 @@ export function useBlinkManager({
     clearAllTimers();
 
     if (!enabled) {
-      setBlinkState({ leftEyeClosed: false, rightEyeClosed: false });
+      const resetTimer = window.setTimeout(() => {
+        setBlinkState({ leftEyeClosed: false, rightEyeClosed: false });
+      }, 0);
+      activeTimersRef.current.push(resetTimer);
       return;
     }
 
     if (forceClosed) {
-      setBlinkState({ leftEyeClosed: true, rightEyeClosed: true });
+      const closeTimer = window.setTimeout(() => {
+        setBlinkState({ leftEyeClosed: true, rightEyeClosed: true });
+      }, 0);
+      activeTimersRef.current.push(closeTimer);
       return;
     }
 
-    switch (proximityState) {
-      case 'FAR': {
-        // Natural, slow feline blink every 6 to 10 seconds
-        const scheduleFarBlink = () => {
-          const delay = 6000 + Math.random() * 4500;
-          const timer = window.setTimeout(() => {
-            blinkEye('both', 300);
-            scheduleFarBlink();
-          }, delay);
-          activeTimersRef.current.push(timer);
-        };
-        scheduleFarBlink();
-        break;
-      }
-
-      case 'GETTING_CLOSER': {
-        // One eye (left eye) starts blinking periodically with smooth pacing
-        const scheduleOneEyeBlink = () => {
-          const delay = 2400 + Math.random() * 1200;
-          const timer = window.setTimeout(() => {
-            blinkEye('left', 260);
-            scheduleOneEyeBlink();
-          }, delay);
-          activeTimersRef.current.push(timer);
-        };
-        scheduleOneEyeBlink();
-        break;
-      }
-
-      case 'CLOSER': {
-        // Both eyes blink asynchronously at independent smooth intervals
-        const scheduleLeftAsync = () => {
-          const delay = 1800 + Math.random() * 900;
-          const timer = window.setTimeout(() => {
-            blinkEye('left', 260);
-            scheduleLeftAsync();
-          }, delay);
-          activeTimersRef.current.push(timer);
-        };
-
-        const scheduleRightAsync = () => {
-          const delay = 2500 + Math.random() * 1100;
-          const timer = window.setTimeout(() => {
-            blinkEye('right', 260);
-            scheduleRightAsync();
-          }, delay);
-          activeTimersRef.current.push(timer);
-        };
-
-        scheduleLeftAsync();
-        scheduleRightAsync();
-        break;
-      }
-
-      case 'VERY_CLOSE': {
-        // Eyes blink alternately in a smooth ping-pong rhythm (left then right)
-        let isLeftTurn = true;
-        const scheduleAlternateBlink = () => {
-          const delay = 720;
-          const timer = window.setTimeout(() => {
-            blinkEye(isLeftTurn ? 'left' : 'right', 250);
-            isLeftTurn = !isLeftTurn;
-            scheduleAlternateBlink();
-          }, delay);
-          activeTimersRef.current.push(timer);
-        };
-        scheduleAlternateBlink();
-        break;
-      }
-
-      case 'INSIDE_TARGET': {
-        // Final Proximity State: Hyper-focused predatory lock
-        // Eyes stay wide open, zero spontaneous blinking
+    // TARGET FOUND: STOP ALL BLINKING IMMEDIATELY!
+    if (proximityState === 'INSIDE_TARGET') {
+      const openTimer = window.setTimeout(() => {
         setBlinkState({ leftEyeClosed: false, rightEyeClosed: false });
-        break;
-      }
+      }, 0);
+      activeTimersRef.current.push(openTimer);
+      return;
     }
 
-    return () => clearAllTimers();
-  }, [proximityState, forceClosed, enabled, blinkEye, clearAllTimers]);
+    // Dynamic Progressive Blinking Loop
+    let isCancelled = false;
+
+    const scheduleNextBlink = () => {
+      if (isCancelled || !enabledRef.current || forceClosedRef.current) return;
+      if (proximityRef.current === 'INSIDE_TARGET') {
+        setBlinkState({ leftEyeClosed: false, rightEyeClosed: false });
+        return;
+      }
+
+      const currentDist = distanceRef.current;
+      const maxDistance = 500;
+      const minDistance = 58; // Target hit radius
+      const clampedDist = Math.max(minDistance, Math.min(maxDistance, currentDist));
+      const factor = (clampedDist - minDistance) / (maxDistance - minDistance); // 0 (at edge) to 1 (far)
+
+      // Frequency calculation:
+      // factor = 1.0 (far): ~3600ms
+      // factor = 0.5 (mid): ~1400ms
+      // factor = 0.2 (close): ~550ms
+      // factor = 0.05 (very close edge): ~220ms
+      const delay = Math.round(180 + Math.pow(factor, 1.35) * 3400);
+
+      // Blink closing duration:
+      // When far: 240ms (slow, organic blink)
+      // When near: 100ms (rapid, nervous twitch)
+      const duration = Math.round(95 + Math.pow(factor, 1.2) * 145);
+
+      // Eye mode selection:
+      let eyeToBlink: 'left' | 'right' | 'both';
+      if (factor > 0.65) {
+        // Far away: predominantly slow double blinks
+        eyeToBlink = Math.random() < 0.75 ? 'both' : (Math.random() < 0.5 ? 'left' : 'right');
+      } else if (factor > 0.25) {
+        // Getting closer: asynchronous alternating wink
+        eyeToBlink = nextEyeRef.current;
+        nextEyeRef.current = nextEyeRef.current === 'left' ? 'right' : 'left';
+      } else {
+        // Very close: rapid alternating ping-pong flutter
+        eyeToBlink = nextEyeRef.current;
+        nextEyeRef.current = nextEyeRef.current === 'left' ? 'right' : 'left';
+      }
+
+      const timerId = window.setTimeout(() => {
+        if (isCancelled || proximityRef.current === 'INSIDE_TARGET') return;
+        blinkEye(eyeToBlink, duration);
+        scheduleNextBlink();
+      }, delay);
+
+      activeTimersRef.current.push(timerId);
+    };
+
+    // Initial kick-off with a responsive short delay
+    const initialDelay = proximityState === 'VERY_CLOSE' ? 120 : proximityState === 'CLOSER' ? 300 : 800;
+    const startTimer = window.setTimeout(() => {
+      scheduleNextBlink();
+    }, initialDelay);
+    activeTimersRef.current.push(startTimer);
+
+    return () => {
+      isCancelled = true;
+      clearAllTimers();
+    };
+  }, [proximityState, distance, forceClosed, enabled, blinkEye, clearAllTimers]);
 
   return {
     blinkState: forceClosed ? { leftEyeClosed: true, rightEyeClosed: true } : blinkState,

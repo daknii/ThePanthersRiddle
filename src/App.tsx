@@ -24,7 +24,7 @@ export const App: React.FC = () => {
   });
 
   // 2. Proximity Calculation relative to invisible target
-  const { proximityState } = useProximityCalculation({
+  const { proximityState, distance } = useProximityCalculation({
     cursor,
     config: PUZZLE_CONFIG,
   });
@@ -32,6 +32,7 @@ export const App: React.FC = () => {
   // 3. Blink State Management based on proximity levels
   const { blinkState } = useBlinkManager({
     proximityState,
+    distance,
     forceClosed: forceEyesClosed,
     enabled: isEyesRevealed && gameState === 'PLAYING',
   });

@@ -17,6 +17,7 @@ interface PantherEyesProps {
  * - Subtle cursor tracking: ONLY the black feline slit pupils glide smoothly.
  * - Slower, silky smooth eyelid transitions for organic, lifelike blinks.
  * - Deep, clean slow close upon click resolution.
+ * - Target Lock: When inside the target, blinking STOPS and a vivid glowing red signal flares in both eyes.
  * - Iris striations and tapetum lucidum subtle glow.
  */
 export const PantherEyes: React.FC<PantherEyesProps> = ({
@@ -61,11 +62,11 @@ export const PantherEyes: React.FC<PantherEyesProps> = ({
     }
   }, [onEyesRevealed]);
 
-  // Final proximity state: hyper-focus pupil dilation or razor slit
+  // Final proximity state: target area found
   const isInside = proximityState === 'INSIDE_TARGET';
 
-  // Slower, cleaner eyelid animation timing
-  const eyelidTransitionDuration = forceClosed ? '2200ms' : '280ms';
+  // Dynamic eyelid transition duration based on state
+  const eyelidTransitionDuration = forceClosed ? '2200ms' : '220ms';
   const eyelidTimingFunction = forceClosed
     ? 'cubic-bezier(0.22, 1, 0.36, 1)'
     : 'cubic-bezier(0.25, 1, 0.5, 1)';
@@ -79,8 +80,8 @@ export const PantherEyes: React.FC<PantherEyesProps> = ({
     >
       {/* Background Tapetum Subtle Eye Shine Glow */}
       <div
-        className={`absolute inset-0 m-auto w-72 h-36 rounded-full bg-[#e6001a] blur-3xl pointer-events-none transition-all duration-1000 ${
-          isInside ? 'opacity-35 scale-125' : 'opacity-15 scale-100'
+        className={`absolute inset-0 m-auto w-80 h-40 rounded-full bg-[#ff0026] blur-3xl pointer-events-none transition-all duration-700 ${
+          isInside ? 'opacity-50 scale-135 animate-eye-signal-aura' : 'opacity-15 scale-100'
         }`}
       />
 
@@ -88,7 +89,11 @@ export const PantherEyes: React.FC<PantherEyesProps> = ({
       <div className="relative w-36 sm:w-44 md:w-52 h-20 sm:h-24 md:h-28">
         <svg
           viewBox="0 0 240 120"
-          className="w-full h-full overflow-visible drop-shadow-[0_0_25px_rgba(230,0,26,0.4)]"
+          className={`w-full h-full overflow-visible transition-all duration-500 ${
+            isInside
+              ? 'drop-shadow-[0_0_35px_rgba(255,0,38,0.85)] drop-shadow-[0_0_70px_rgba(230,0,26,0.5)]'
+              : 'drop-shadow-[0_0_25px_rgba(230,0,26,0.4)]'
+          }`}
         >
           <defs>
             {/* Left Eye Cutout ClipPath (Sleek predatory feline shape) */}
@@ -103,6 +108,14 @@ export const PantherEyes: React.FC<PantherEyesProps> = ({
               <stop offset="60%" stopColor="#990011" />
               <stop offset="85%" stopColor="#54000a" />
               <stop offset="100%" stopColor="#240004" />
+            </radialGradient>
+
+            {/* Red Signal Core Radial Gradient (Left) */}
+            <radialGradient id="red-signal-grad-left" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stopColor="#ffffff" stopOpacity="1" />
+              <stop offset="25%" stopColor="#ff1a38" stopOpacity="0.95" />
+              <stop offset="65%" stopColor="#cc001a" stopOpacity="0.75" />
+              <stop offset="100%" stopColor="#7a000d" stopOpacity="0" />
             </radialGradient>
 
             {/* Tapetum Lucidum Specular Sheen */}
@@ -174,13 +187,87 @@ export const PantherEyes: React.FC<PantherEyesProps> = ({
               <path
                 d={
                   isInside
-                    ? 'M 120,34 C 127,46 127,74 120,86 C 113,74 113,46 120,34 Z'
+                    ? 'M 120,35 C 126,46 126,74 120,85 C 114,74 114,46 120,35 Z'
                     : 'M 120,32 C 129,45 129,75 120,88 C 111,75 111,45 120,32 Z'
                 }
                 fill="#000000"
               />
               {/* Deep Void Core */}
               <ellipse cx="120" cy="60" rx="3.5" ry="16" fill="#000000" />
+
+              {/* RED SIGNAL EMITTER (Active only when cursor finds the target area) */}
+              <g
+                className={`red-signal-group transition-all duration-300 ${
+                  isInside ? 'opacity-100 scale-100' : 'opacity-0 scale-50 pointer-events-none'
+                }`}
+                style={{ transformOrigin: '120px 60px' }}
+              >
+                {/* Sonar / Radar Waves */}
+                <circle
+                  cx="120"
+                  cy="60"
+                  r="8"
+                  fill="none"
+                  stroke="#ff1a38"
+                  strokeWidth="1.5"
+                  className={isInside ? 'animate-signal-ring-1' : ''}
+                />
+                <circle
+                  cx="120"
+                  cy="60"
+                  r="16"
+                  fill="none"
+                  stroke="#ff002b"
+                  strokeWidth="1.2"
+                  className={isInside ? 'animate-signal-ring-2' : ''}
+                />
+                <circle
+                  cx="120"
+                  cy="60"
+                  r="24"
+                  fill="none"
+                  stroke="#ff3355"
+                  strokeWidth="0.8"
+                  className={isInside ? 'animate-signal-ring-3' : ''}
+                />
+
+                {/* Radiant Pulsing Crimson Flare Core */}
+                <circle
+                  cx="120"
+                  cy="60"
+                  r="11"
+                  fill="url(#red-signal-grad-left)"
+                  className={isInside ? 'animate-signal-glow' : ''}
+                />
+
+                {/* Vertical Laser Slit Flare */}
+                <line
+                  x1="120"
+                  y1="40"
+                  x2="120"
+                  y2="80"
+                  stroke="#ff1a40"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  className={isInside ? 'animate-signal-slit' : ''}
+                  style={{ filter: 'drop-shadow(0 0 6px #ff0033)' }}
+                />
+
+                {/* Brilliant Signal Core Light Center */}
+                <circle
+                  cx="120"
+                  cy="60"
+                  r="3.2"
+                  fill="#ffffff"
+                  style={{ filter: 'drop-shadow(0 0 8px #ff0033) drop-shadow(0 0 16px #ff0022)' }}
+                />
+                <circle
+                  cx="120"
+                  cy="60"
+                  r="1.6"
+                  fill="#ffe6ea"
+                />
+              </g>
             </g>
 
             {/* Specular Corneal Highlight (Moist reflection) */}
@@ -248,7 +335,11 @@ export const PantherEyes: React.FC<PantherEyesProps> = ({
       <div className="relative w-36 sm:w-44 md:w-52 h-20 sm:h-24 md:h-28">
         <svg
           viewBox="0 0 240 120"
-          className="w-full h-full overflow-visible drop-shadow-[0_0_25px_rgba(230,0,26,0.4)]"
+          className={`w-full h-full overflow-visible transition-all duration-500 ${
+            isInside
+              ? 'drop-shadow-[0_0_35px_rgba(255,0,38,0.85)] drop-shadow-[0_0_70px_rgba(230,0,26,0.5)]'
+              : 'drop-shadow-[0_0_25px_rgba(230,0,26,0.4)]'
+          }`}
         >
           <defs>
             {/* Right Eye Cutout ClipPath */}
@@ -263,6 +354,14 @@ export const PantherEyes: React.FC<PantherEyesProps> = ({
               <stop offset="60%" stopColor="#990011" />
               <stop offset="85%" stopColor="#54000a" />
               <stop offset="100%" stopColor="#240004" />
+            </radialGradient>
+
+            {/* Red Signal Core Radial Gradient (Right) */}
+            <radialGradient id="red-signal-grad-right" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stopColor="#ffffff" stopOpacity="1" />
+              <stop offset="25%" stopColor="#ff1a38" stopOpacity="0.95" />
+              <stop offset="65%" stopColor="#cc001a" stopOpacity="0.75" />
+              <stop offset="100%" stopColor="#7a000d" stopOpacity="0" />
             </radialGradient>
           </defs>
 
@@ -326,12 +425,86 @@ export const PantherEyes: React.FC<PantherEyesProps> = ({
               <path
                 d={
                   isInside
-                    ? 'M 120,34 C 127,46 127,74 120,86 C 113,74 113,46 120,34 Z'
+                    ? 'M 120,35 C 126,46 126,74 120,85 C 114,74 114,46 120,35 Z'
                     : 'M 120,32 C 129,45 129,75 120,88 C 111,75 111,45 120,32 Z'
                 }
                 fill="#000000"
               />
               <ellipse cx="120" cy="60" rx="3.5" ry="16" fill="#000000" />
+
+              {/* RED SIGNAL EMITTER (Active only when cursor finds the target area) */}
+              <g
+                className={`red-signal-group transition-all duration-300 ${
+                  isInside ? 'opacity-100 scale-100' : 'opacity-0 scale-50 pointer-events-none'
+                }`}
+                style={{ transformOrigin: '120px 60px' }}
+              >
+                {/* Sonar / Radar Waves */}
+                <circle
+                  cx="120"
+                  cy="60"
+                  r="8"
+                  fill="none"
+                  stroke="#ff1a38"
+                  strokeWidth="1.5"
+                  className={isInside ? 'animate-signal-ring-1' : ''}
+                />
+                <circle
+                  cx="120"
+                  cy="60"
+                  r="16"
+                  fill="none"
+                  stroke="#ff002b"
+                  strokeWidth="1.2"
+                  className={isInside ? 'animate-signal-ring-2' : ''}
+                />
+                <circle
+                  cx="120"
+                  cy="60"
+                  r="24"
+                  fill="none"
+                  stroke="#ff3355"
+                  strokeWidth="0.8"
+                  className={isInside ? 'animate-signal-ring-3' : ''}
+                />
+
+                {/* Radiant Pulsing Crimson Flare Core */}
+                <circle
+                  cx="120"
+                  cy="60"
+                  r="11"
+                  fill="url(#red-signal-grad-right)"
+                  className={isInside ? 'animate-signal-glow' : ''}
+                />
+
+                {/* Vertical Laser Slit Flare */}
+                <line
+                  x1="120"
+                  y1="40"
+                  x2="120"
+                  y2="80"
+                  stroke="#ff1a40"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  className={isInside ? 'animate-signal-slit' : ''}
+                  style={{ filter: 'drop-shadow(0 0 6px #ff0033)' }}
+                />
+
+                {/* Brilliant Signal Core Light Center */}
+                <circle
+                  cx="120"
+                  cy="60"
+                  r="3.2"
+                  fill="#ffffff"
+                  style={{ filter: 'drop-shadow(0 0 8px #ff0033) drop-shadow(0 0 16px #ff0022)' }}
+                />
+                <circle
+                  cx="120"
+                  cy="60"
+                  r="1.6"
+                  fill="#ffe6ea"
+                />
+              </g>
             </g>
 
             {/* Specular Corneal Highlight */}

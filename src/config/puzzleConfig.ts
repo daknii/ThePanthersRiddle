@@ -12,14 +12,15 @@ export const PUZZLE_CONFIG: TargetConfig = {
   yPercent: 28,
 
   // Hit radius: inside this radius, the click is registered as SUCCESS
-  hitRadiusPx: 48,
+  // Slightly expanded for fairer, more intuitive discovery
+  hitRadiusPx: 58,
 
   // Distance thresholds from cursor to target center (in pixels)
   thresholds: {
-    gettingCloserPx: 420, // Start single eye blinking
-    closerPx: 260,        // Asynchronous both eyes blinking
-    veryClosePx: 120,     // Alternating rapid ping-pong blinking
-    // < hitRadiusPx (48px) = INSIDE_TARGET (final predatory lock)
+    gettingCloserPx: 480, // Start initial blinking response
+    closerPx: 280,        // Noticeably faster blinking
+    veryClosePx: 140,     // Very rapid alternating ping-pong flutter
+    // <= hitRadiusPx (58px) = INSIDE_TARGET (stop blinking + red signal)
   },
 
   // STRICT DESIGN RULE: No debug indicators in production UI

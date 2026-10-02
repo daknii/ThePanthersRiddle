@@ -28,9 +28,9 @@ export const AccessibleTracker: React.FC<AccessibleTrackerProps> = ({
       case 'CLOSER':
         return 'Ambos os olhos piscam de maneira descompassada e assíncrona.';
       case 'VERY_CLOSE':
-        return 'Os olhos piscam alternadamente em ritmo veloz.';
+        return 'Os olhos piscam freneticamente em ritmo muito acelerado.';
       case 'INSIDE_TARGET':
-        return 'Os olhos congelam em foco absoluto. Você está dentro do ponto.';
+        return 'Alvo encontrado! Os olhos pararam de piscar e um sinal vermelho pulsa em suas pupilas. Clique agora.';
     }
   };
 

@@ -20,7 +20,9 @@ export function useCursorTracking({ enabled }: UseCursorTrackingOptions) {
   });
 
   const cursorRef = useRef(cursor);
-  cursorRef.current = cursor;
+  useEffect(() => {
+    cursorRef.current = cursor;
+  }, [cursor]);
 
   const updatePosition = useCallback((clientX: number, clientY: number) => {
     if (!enabled) return;

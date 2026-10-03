@@ -8,6 +8,11 @@ export const RaizPage: React.FC = () => {
   const dividerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    console.log(
+      '%cVIGENERE',
+      'color: #e6001a; font-family: monospace; font-size: 14px; font-weight: bold; letter-spacing: 0.25em;'
+    );
+
     const containerEl = containerRef.current;
     const tagEl = tagRef.current;
     const textEl = textRef.current;

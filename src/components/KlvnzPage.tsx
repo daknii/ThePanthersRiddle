@@ -68,7 +68,7 @@ export const KlvnzPage: React.FC = () => {
       ref={containerRef}
       className="relative w-screen h-screen min-h-screen bg-[#050303] text-[#e0d6d8] overflow-hidden select-none cursor-default flex flex-col items-center justify-center px-6 sm:px-12"
       style={{ opacity: 0 }}
-      aria-label="KLVNZ — Enigma Antirian"
+      aria-label="KLVNZ — Enigma da Pantera"
     >
       <div className="vignette-crimson" aria-hidden="true" />
       <div className="noise-overlay" aria-hidden="true" />

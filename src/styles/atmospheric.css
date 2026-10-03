@@ -180,6 +180,80 @@ html, body {
   animation: eyeSignalGlow 1.8s ease-in-out infinite;
 }
 
+/* ───────────── Audio Gate (minimal entry screen) ───────────── */
+.audio-gate {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.1rem;
+  background: var(--bg-void);
+  animation: gateFadeIn 2s var(--ease-smooth-fade) both;
+}
+
+.audio-gate.is-leaving {
+  animation: gateFadeOut 1.2s var(--ease-smooth-fade) forwards;
+  pointer-events: none;
+}
+
+@keyframes gateFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes gateFadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+.audio-gate__button {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.85rem;
+  letter-spacing: 0.5em;
+  padding: 0.6rem 0 0.6rem 0.5em;
+  color: #8f8083;
+  background: none;
+  border: none;
+  transition: color 0.6s var(--ease-cinematic), text-shadow 0.6s var(--ease-cinematic);
+}
+
+.audio-gate__button:hover,
+.audio-gate__button:focus-visible {
+  outline: none;
+  color: var(--crimson-glow);
+  text-shadow: 0 0 18px rgba(230, 0, 26, 0.45);
+}
+
+.audio-gate__hint {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.3em;
+  color: #3d3335;
+  margin: 0;
+}
+
+/* Panther Roar Screen Rumble */
+@keyframes pantherScreenRumble {
+  0% { transform: translate(0, 0) rotate(0deg); }
+  10% { transform: translate(-4px, 3px) rotate(-0.5deg); }
+  20% { transform: translate(5px, -4px) rotate(0.6deg); }
+  30% { transform: translate(-6px, 5px) rotate(-0.7deg); }
+  40% { transform: translate(4px, -3px) rotate(0.4deg); }
+  50% { transform: translate(-5px, 4px) rotate(-0.5deg); }
+  60% { transform: translate(6px, -2px) rotate(0.6deg); }
+  70% { transform: translate(-4px, 3px) rotate(-0.4deg); }
+  80% { transform: translate(3px, -2px) rotate(0.3deg); }
+  90% { transform: translate(-2px, 1px) rotate(-0.2deg); }
+  100% { transform: translate(0, 0) rotate(0deg); }
+}
+
+.animate-panther-screen-rumble {
+  animation: pantherScreenRumble 0.12s infinite;
+}
+
 /* Reduced Motion Compliance */
 @media (prefers-reduced-motion: reduce) {
   * {

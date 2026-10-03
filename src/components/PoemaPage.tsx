@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { createTimeline } from 'animejs';
+import { audioEngine } from '../audio/audioEngine';
 
 const VERSES = [
   "Falam as lendas que uma pantera vive aqui.",
@@ -18,6 +19,10 @@ export const PoemaPage: React.FC = () => {
   const titleRef = useRef<HTMLHeadingElement>(null);
   const dividerRef = useRef<HTMLDivElement>(null);
   const versesRef = useRef<(HTMLParagraphElement | null)[]>([]);
+
+  useEffect(() => {
+    audioEngine.setMood('life');
+  }, []);
 
   useEffect(() => {
     const containerEl = containerRef.current;
@@ -101,7 +106,7 @@ export const PoemaPage: React.FC = () => {
       ref={containerRef}
       className="relative w-screen h-screen min-h-screen bg-[#050303] text-[#e0d6d8] overflow-y-auto overflow-x-hidden select-text cursor-default flex flex-col items-center justify-center py-10 px-6 sm:px-12"
       style={{ opacity: 0 }}
-      aria-label="Poema Pantera — Enigma Antirian"
+      aria-label="Poema Pantera — Enigma da Pantera"
     >
       {/* Atmospheric Layers */}
       <div className="vignette-crimson" aria-hidden="true" />

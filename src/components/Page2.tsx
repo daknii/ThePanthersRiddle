@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { animate, createTimeline } from 'animejs';
+import { audioEngine } from '../audio/audioEngine';
 
 interface Page2Props {
   onComplete: () => void;
@@ -73,6 +74,8 @@ export const Page2: React.FC<Page2Props> = ({ onComplete, onDeath }) => {
     if (completedRef.current) return;
     completedRef.current = true;
     setIsTransitioning(true);
+    audioEngine.setTension(0);
+    audioEngine.playStinger('success');
 
     if (resetTimerRef.current) {
       window.clearTimeout(resetTimerRef.current);
@@ -103,6 +106,8 @@ export const Page2: React.FC<Page2Props> = ({ onComplete, onDeath }) => {
     if (completedRef.current) return;
     completedRef.current = true;
     setIsDying(true);
+    audioEngine.setTension(0);
+    audioEngine.playStinger('death');
 
     if (resetTimerRef.current) {
       window.clearTimeout(resetTimerRef.current);
@@ -145,22 +150,24 @@ export const Page2: React.FC<Page2Props> = ({ onComplete, onDeath }) => {
     const nextCount = clickCountRef.current + 1;
     clickCountRef.current = nextCount;
     setClickCount(nextCount);
+    audioEngine.playClick(nextCount);
+    audioEngine.setTension(Math.min(1, nextCount / 7));
 
     if (nextCount >= 8) {
       triggerDeath();
       return;
     }
 
-    if (nextCount === 7) {
-      triggerSuccess();
-      return;
-    }
-
     resetTimerRef.current = window.setTimeout(() => {
       resetTimerRef.current = null;
       if (!completedRef.current) {
-        clickCountRef.current = 0;
-        setClickCount(0);
+        if (clickCountRef.current === 7) {
+          triggerSuccess();
+        } else {
+          clickCountRef.current = 0;
+          setClickCount(0);
+          audioEngine.setTension(0);
+        }
       }
     }, MAX_INTERVAL_MS);
   }, [isTransitioning, isDying, triggerDeath, triggerSuccess]);
@@ -170,6 +177,7 @@ export const Page2: React.FC<Page2Props> = ({ onComplete, onDeath }) => {
       if (resetTimerRef.current) {
         window.clearTimeout(resetTimerRef.current);
       }
+      audioEngine.setTension(0);
     };
   }, []);
 

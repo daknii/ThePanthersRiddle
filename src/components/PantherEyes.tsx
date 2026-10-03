@@ -8,6 +8,7 @@ interface PantherEyesProps {
   proximityState: ProximityState;
   forceClosed?: boolean;
   onEyesRevealed?: () => void;
+  revealDelay?: number;
 }
 
 export const PantherEyes: React.FC<PantherEyesProps> = ({
@@ -16,6 +17,7 @@ export const PantherEyes: React.FC<PantherEyesProps> = ({
   proximityState,
   forceClosed = false,
   onEyesRevealed,
+  revealDelay = 3200,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const leftPupilRef = useRef<SVGGElement>(null);
@@ -42,15 +44,15 @@ export const PantherEyes: React.FC<PantherEyesProps> = ({
         opacity: [0, 1],
         filter: ['blur(16px)', 'blur(0px)'],
         scale: [0.95, 1],
-        duration: 4800,
-        delay: 3200,
+        duration: 3600,
+        delay: revealDelay,
         ease: 'inOutCubic',
         onComplete: () => {
           if (onEyesRevealed) onEyesRevealed();
         },
       });
     }
-  }, [onEyesRevealed]);
+  }, [onEyesRevealed, revealDelay]);
 
   const isInside = proximityState === 'INSIDE_TARGET';
 

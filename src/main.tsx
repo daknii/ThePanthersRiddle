@@ -1,6 +1,6 @@
 import { StrictMode, Suspense } from 'react'
 import { createRoot } from 'react-dom/client'
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import './index.css'
 import App from './App.tsx'
 import { AudioGate } from './components/AudioGate.tsx'
@@ -16,6 +16,7 @@ import {
   IrisPage,
   SilencioPage,
   TrevasPage,
+  EternoPage,
 } from './routes/lazyPages.ts'
 
 createRoot(document.getElementById('root')!).render(
@@ -42,6 +43,10 @@ createRoot(document.getElementById('root')!).render(
           <Route path="/SILENCIO" element={<SilencioPage />} />
           <Route path="/trevas" element={<TrevasPage />} />
           <Route path="/TREVAS" element={<TrevasPage />} />
+          <Route path="/eterno" element={<Navigate to="/trevas" replace />} />
+          <Route path="/ETERNO" element={<Navigate to="/trevas" replace />} />
+          <Route path="/climax" element={<EternoPage />} />
+          <Route path="/CLIMAX" element={<EternoPage />} />
         </Routes>
       </Suspense>
       </AudioGate>

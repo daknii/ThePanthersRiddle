@@ -12,7 +12,7 @@
  * lowered underneath it). If the file doesn't exist, nothing breaks.
  */
 
-export type MusicMood = 'hunt' | 'binary' | 'poem' | 'deep' | 'death' | 'life';
+export type MusicMood = 'hunt' | 'binary' | 'poem' | 'deep' | 'death' | 'life' | 'strings';
 export type Stinger = 'success' | 'death';
 
 /** Path (served from /public) of an optional custom music track. */
@@ -37,6 +37,7 @@ const ROUTE_MOODS: Record<string, MusicMood> = {
   '/iris': 'hunt',
   '/silencio': 'deep',
   '/trevas': 'deep',
+  '/climax': 'deep',
 };
 
 export function moodForPath(pathname: string): MusicMood | null {
@@ -105,7 +106,136 @@ const MOODS: Record<MusicMood, MoodPreset> = {
     bellRoot: 523.25, bellLevel: 0, bellEveryMs: [4000, 8000], scale: [0],
     blips: false, reverbSend: 0.75, trackCutoff: 18000, trackLevel: 0.15,
   },
+  // Climax finale: string ensemble, violins and cellos (pure classical strings, no drums).
+  strings: {
+    root: 65.41, upperRatio: 1.5,
+    droneLevel: 0, droneCutoff: 320, subLevel: 0, windLevel: 0.01,
+    bellRoot: 523.25, bellLevel: 0, bellEveryMs: [4000, 8000], scale: [0],
+    blips: false, reverbSend: 0.85, trackCutoff: 18000, trackLevel: 0.1,
+  },
 };
+
+// ─────────────── "Strings" — classical string orchestra finale ───────────────
+// Composed for:
+// - Solo / 1st Violins: expressive, singing lead melody with delayed vibrato & bowing
+// - Cellos: deep resonant counter-melody and walking bass with authentic body resonance
+// - Cordas (Violas & 2nd Violins): warm, swelling string ensemble chord pads
+// Absolutely NO drums or percussion. Pure orchestral grandeur and poignant emotion.
+
+/** 73% speed of original tempo (72 * 0.73 ≈ 52 BPM): solemn, dark, and expansive. */
+const STRINGS_BPM = 52;
+/** Pitched down by 5 semitones (~73% tape playback speed pitch drop): deep and warm. */
+const STRINGS_PITCH_OFFSET = -5;
+
+interface StringsBar {
+  chord: number[];
+  /** [eighth within bar, MIDI note, length in eighths, velocity] */
+  cello: Array<[number, number, number, number]>;
+  /** [eighth within bar, MIDI note, length in eighths, velocity] */
+  violin: Array<[number, number, number, number]>;
+}
+
+const STRINGS_SONG: StringsBar[] = [
+  // ─── Section A: Solemn, Bittersweet Awakening ───
+  // Bar 0: Fmaj7
+  {
+    chord: [53, 57, 60, 64],
+    cello: [[0, 41, 4, 0.82], [4, 48, 2, 0.68], [6, 45, 2, 0.62]],
+    violin: [[0, 72, 3, 0.85], [3, 76, 1, 0.78], [4, 77, 2, 0.92], [6, 76, 2, 0.85]],
+  },
+  // Bar 1: G
+  {
+    chord: [55, 59, 62, 67],
+    cello: [[0, 43, 4, 0.82], [4, 50, 2, 0.68], [6, 47, 2, 0.62]],
+    violin: [[0, 74, 3, 0.88], [3, 71, 1, 0.78], [4, 74, 4, 0.92]],
+  },
+  // Bar 2: Em7
+  {
+    chord: [52, 55, 59, 62],
+    cello: [[0, 40, 4, 0.82], [4, 47, 2, 0.68], [6, 43, 2, 0.62]],
+    violin: [[0, 71, 3, 0.85], [3, 74, 1, 0.78], [4, 79, 2, 0.95], [6, 76, 2, 0.85]],
+  },
+  // Bar 3: Am7
+  {
+    chord: [57, 60, 64, 67],
+    cello: [[0, 45, 4, 0.82], [4, 52, 2, 0.68], [6, 48, 2, 0.62]],
+    violin: [[0, 76, 5, 0.92], [5, 74, 1, 0.72], [6, 72, 2, 0.82]],
+  },
+  // Bar 4: Dm7
+  {
+    chord: [53, 57, 60, 62],
+    cello: [[0, 38, 4, 0.82], [4, 45, 2, 0.68], [6, 41, 2, 0.62]],
+    violin: [[0, 77, 3, 0.88], [3, 76, 1, 0.78], [4, 74, 2, 0.85], [6, 72, 2, 0.82]],
+  },
+  // Bar 5: G7sus4 -> G7
+  {
+    chord: [55, 60, 62, 65],
+    cello: [[0, 43, 4, 0.82], [4, 50, 2, 0.68], [6, 47, 2, 0.62]],
+    violin: [[0, 74, 3, 0.88], [3, 72, 1, 0.78], [4, 74, 2, 0.88], [6, 79, 2, 0.96]],
+  },
+  // Bar 6: Cmaj7
+  {
+    chord: [48, 55, 59, 64],
+    cello: [[0, 36, 4, 0.85], [4, 43, 2, 0.68], [6, 48, 2, 0.65]],
+    violin: [[0, 76, 4, 0.92], [4, 79, 2, 0.88], [6, 83, 2, 0.96]],
+  },
+  // Bar 7: E7
+  {
+    chord: [52, 56, 59, 62],
+    cello: [[0, 40, 4, 0.82], [4, 47, 2, 0.68], [6, 44, 2, 0.62]],
+    violin: [[0, 80, 4, 0.92], [4, 76, 2, 0.85], [6, 74, 2, 0.82]],
+  },
+
+  // ─── Section B: Emotional Climax & High Violin Range ───
+  // Bar 8: Fmaj9
+  {
+    chord: [53, 57, 60, 64, 67],
+    cello: [[0, 41, 3, 0.85], [3, 48, 1, 0.7], [4, 52, 2, 0.75], [6, 48, 2, 0.68]],
+    violin: [[0, 81, 3, 0.95], [3, 79, 1, 0.82], [4, 81, 2, 0.96], [6, 84, 2, 1.0]],
+  },
+  // Bar 9: G
+  {
+    chord: [55, 59, 62, 67],
+    cello: [[0, 43, 3, 0.85], [3, 50, 1, 0.7], [4, 55, 2, 0.75], [6, 50, 2, 0.68]],
+    violin: [[0, 83, 4, 1.0], [4, 81, 2, 0.92], [6, 79, 2, 0.88]],
+  },
+  // Bar 10: Em7
+  {
+    chord: [52, 55, 59, 64],
+    cello: [[0, 40, 3, 0.85], [3, 47, 1, 0.7], [4, 52, 2, 0.75], [6, 47, 2, 0.68]],
+    violin: [[0, 79, 3, 0.92], [3, 83, 1, 0.86], [4, 86, 2, 1.0], [6, 83, 2, 0.92]],
+  },
+  // Bar 11: Am9
+  {
+    chord: [57, 60, 64, 71],
+    cello: [[0, 45, 3, 0.85], [3, 52, 1, 0.7], [4, 57, 2, 0.75], [6, 52, 2, 0.68]],
+    violin: [[0, 84, 4, 1.0], [4, 81, 2, 0.92], [6, 76, 2, 0.86]],
+  },
+  // Bar 12: Dm9
+  {
+    chord: [53, 57, 60, 65],
+    cello: [[0, 38, 3, 0.85], [3, 45, 1, 0.7], [4, 50, 2, 0.75], [6, 45, 2, 0.68]],
+    violin: [[0, 77, 3, 0.9], [3, 79, 1, 0.82], [4, 81, 2, 0.96], [6, 77, 2, 0.88]],
+  },
+  // Bar 13: G7sus4 -> G7
+  {
+    chord: [55, 59, 62, 65],
+    cello: [[0, 43, 3, 0.85], [3, 50, 1, 0.7], [4, 53, 2, 0.75], [6, 50, 2, 0.68]],
+    violin: [[0, 79, 4, 0.96], [4, 77, 2, 0.88], [6, 74, 2, 0.82]],
+  },
+  // Bar 14: Cadd9
+  {
+    chord: [48, 55, 62, 64],
+    cello: [[0, 36, 4, 0.88], [4, 43, 2, 0.72], [6, 48, 2, 0.68]],
+    violin: [[0, 76, 4, 0.92], [4, 79, 2, 0.92], [6, 84, 2, 0.98]],
+  },
+  // Bar 15: Cmaj7 (Final Transcendence)
+  {
+    chord: [48, 52, 55, 59, 64],
+    cello: [[0, 36, 8, 0.88]],
+    violin: [[0, 84, 6, 0.98], [6, 79, 2, 0.82]],
+  },
+];
 
 // ─────────────── "Life" — gentle, upbeat-but-slow piano piece ───────────────
 // Original composition in C major: rolling piano arpeggios, warm pad, a bouncy
@@ -168,6 +298,9 @@ class AudioEngine {
   private lifeBus!: GainNode;
   private lifeStep = 0;
   private lifeNextTime = 0;
+  private stringsBus!: GainNode;
+  private stringsStep = 0;
+  private stringsNextTime = 0;
 
   private mood: MusicMood = 'hunt';
   private tension = 0;
@@ -221,6 +354,9 @@ class AudioEngine {
       // Let the drone fade out for a moment before the song begins.
       this.lifeStep = 0;
       this.lifeNextTime = this.ctx.currentTime + 1.2;
+    } else if (mood === 'strings') {
+      this.stringsStep = 0;
+      this.stringsNextTime = this.ctx.currentTime + 0.8;
     }
     this.applyMood();
     this.scheduleBell(rand(1200, 2600));
@@ -418,6 +554,117 @@ class AudioEngine {
     snap.stop(t + 0.12);
   }
 
+  playMatchStrike(): void {
+    const ctx = this.running();
+    if (!ctx) return;
+    const t = ctx.currentTime;
+
+    // 1. Friction rasp scrape (harsh bandpass noise sweep)
+    if (this.noiseBuffer) {
+      const rasp = ctx.createBufferSource();
+      rasp.buffer = this.noiseBuffer;
+      const f = ctx.createBiquadFilter();
+      f.type = 'bandpass';
+      f.frequency.setValueAtTime(2800, t);
+      f.frequency.exponentialRampToValueAtTime(1400, t + 0.14);
+      f.Q.value = 4.5;
+
+      const env = ctx.createGain();
+      env.gain.setValueAtTime(0, t);
+      env.gain.linearRampToValueAtTime(0.7, t + 0.015);
+      env.gain.exponentialRampToValueAtTime(0.0001, t + 0.16);
+
+      rasp.connect(f).connect(env);
+      this.route(env, this.sfxBus, 0.4);
+      rasp.start(t);
+      rasp.stop(t + 0.18);
+    }
+
+    // 2. Sulfur spark pop
+    const pop = ctx.createOscillator();
+    pop.type = 'triangle';
+    pop.frequency.setValueAtTime(900, t + 0.08);
+    pop.frequency.exponentialRampToValueAtTime(180, t + 0.15);
+    const popEnv = ctx.createGain();
+    popEnv.gain.setValueAtTime(0, t + 0.08);
+    popEnv.gain.linearRampToValueAtTime(0.4, t + 0.09);
+    popEnv.gain.exponentialRampToValueAtTime(0.0001, t + 0.18);
+    pop.connect(popEnv).connect(this.sfxBus);
+    pop.start(t + 0.08);
+    pop.stop(t + 0.2);
+
+    // 3. Flame ignition whoosh (warm low-pass swell)
+    if (this.noiseBuffer) {
+      const whoosh = ctx.createBufferSource();
+      whoosh.buffer = this.noiseBuffer;
+      const wf = ctx.createBiquadFilter();
+      wf.type = 'lowpass';
+      wf.frequency.setValueAtTime(450, t + 0.1);
+      wf.frequency.linearRampToValueAtTime(850, t + 0.25);
+      wf.frequency.exponentialRampToValueAtTime(220, t + 0.6);
+
+      const wEnv = ctx.createGain();
+      wEnv.gain.setValueAtTime(0, t + 0.1);
+      wEnv.gain.linearRampToValueAtTime(0.35, t + 0.22);
+      wEnv.gain.exponentialRampToValueAtTime(0.0001, t + 0.7);
+
+      whoosh.connect(wf).connect(wEnv);
+      this.route(wEnv, this.sfxBus, 0.5);
+      whoosh.start(t + 0.1);
+      whoosh.stop(t + 0.75);
+    }
+  }
+
+  playMatchExtinguish(): void {
+    const ctx = this.running();
+    if (!ctx) return;
+    const t = ctx.currentTime;
+
+    if (this.noiseBuffer) {
+      const hiss = ctx.createBufferSource();
+      hiss.buffer = this.noiseBuffer;
+      const f = ctx.createBiquadFilter();
+      f.type = 'highpass';
+      f.frequency.setValueAtTime(3200, t);
+      f.frequency.exponentialRampToValueAtTime(1600, t + 0.25);
+
+      const env = ctx.createGain();
+      env.gain.setValueAtTime(0, t);
+      env.gain.linearRampToValueAtTime(0.28, t + 0.02);
+      env.gain.exponentialRampToValueAtTime(0.0001, t + 0.28);
+
+      hiss.connect(f).connect(env);
+      this.route(env, this.sfxBus, 0.4);
+      hiss.start(t);
+      hiss.stop(t + 0.3);
+    }
+  }
+
+  playBeastStareRumble(intensity: number): void {
+    const ctx = this.running();
+    if (!ctx) return;
+    const t = ctx.currentTime;
+    const clamped = Math.max(0, Math.min(1, intensity));
+
+    const sub = ctx.createOscillator();
+    sub.type = 'sawtooth';
+    sub.frequency.setValueAtTime(42 + clamped * 12, t);
+
+    const f = ctx.createBiquadFilter();
+    f.type = 'lowpass';
+    f.frequency.setValueAtTime(90 + clamped * 80, t);
+
+    const env = ctx.createGain();
+    env.gain.setValueAtTime(0, t);
+    env.gain.linearRampToValueAtTime(0.25 + clamped * 0.35, t + 0.08);
+    env.gain.exponentialRampToValueAtTime(0.0001, t + 0.4);
+
+    sub.connect(f).connect(env);
+    this.route(env, this.sfxBus, 0.6);
+    sub.start(t);
+    sub.stop(t + 0.45);
+  }
+
   playStinger(kind: Stinger): void {
     const ctx = this.running();
     if (!ctx) return;
@@ -610,6 +857,11 @@ class AudioEngine {
     this.lifeBus = ctx.createGain();
     this.lifeBus.gain.value = 0;
     this.lifeBus.connect(this.musicBus);
+
+    // Strings orchestra bus (cordas, violinos, cellos for Climax finale)
+    this.stringsBus = ctx.createGain();
+    this.stringsBus.gain.value = 0;
+    this.stringsBus.connect(this.musicBus);
   }
 
   private applyMood(immediate = false): void {
@@ -637,6 +889,9 @@ class AudioEngine {
     const lifeTargetGain = this.mood === 'life' ? 0.95 : 0;
     this.lifeBus.gain.setTargetAtTime(lifeTargetGain, now, tc);
 
+    const stringsTargetGain = this.mood === 'strings' ? 0.95 : 0;
+    this.stringsBus.gain.setTargetAtTime(stringsTargetGain, now, tc);
+
     if (this.hasCustomTrack) {
       const trackLevel = p.trackLevel ?? 1;
       this.trackGain.gain.setTargetAtTime(CUSTOM_TRACK_VOLUME * trackLevel, now, tc);
@@ -653,7 +908,7 @@ class AudioEngine {
 
   private scheduleBell(delayMs?: number): void {
     if (this.bellTimer !== null) window.clearTimeout(this.bellTimer);
-    if (this.mood === 'life') return;
+    if (this.mood === 'life' || this.mood === 'strings') return;
     const [min, max] = MOODS[this.mood].bellEveryMs;
     this.bellTimer = window.setTimeout(() => {
       this.playAmbientNote();
@@ -725,6 +980,7 @@ class AudioEngine {
   private tick(): void {
     this.heartbeatTick();
     this.lifeTick();
+    this.stringsTick();
   }
 
   private lifeTick(): void {
@@ -995,6 +1251,281 @@ class AudioEngine {
       this.route(env, this.lifeBus, 0.25, 0.2);
       noise.start(when);
       noise.stop(when + 0.06);
+    }
+  }
+
+  // ─────────────── String Orchestra Synthesis (Finale) ───────────────
+
+  private stringsTick(): void {
+    const ctx = this.running();
+    if (!ctx) return;
+    if (this.mood !== 'strings') return;
+
+    const now = ctx.currentTime;
+    const stepDuration = 60 / (STRINGS_BPM * 2);
+
+    if (this.stringsNextTime < now) {
+      this.stringsNextTime = now + 0.05;
+    }
+
+    while (this.stringsNextTime < now + 0.25) {
+      const totalSteps = STRINGS_SONG.length * 8;
+      const currentStep = this.stringsStep % totalSteps;
+      const barIndex = Math.floor(currentStep / 8);
+      const eighthIndex = currentStep % 8;
+
+      this.scheduleStringsStep(barIndex, eighthIndex, this.stringsNextTime, stepDuration);
+
+      this.stringsStep = (this.stringsStep + 1) % totalSteps;
+      this.stringsNextTime += stepDuration;
+    }
+  }
+
+  private scheduleStringsStep(
+    barIndex: number,
+    eighthIndex: number,
+    when: number,
+    stepDuration: number,
+  ): void {
+    const bar = STRINGS_SONG[barIndex];
+    if (!bar) return;
+
+    // 1. Cordas / String Ensemble Chords (violas, 2nd violins): sustained for 1 full bar
+    if (eighthIndex === 0) {
+      const transposedChord = bar.chord.map((m) => m + STRINGS_PITCH_OFFSET);
+      this.playStringChord(transposedChord, when, stepDuration * 8, 0.88);
+    }
+
+    // 2. Cello: deep expressive counter-melody and walking bass (transposed down)
+    for (const [step, midi, durSteps, vel] of bar.cello) {
+      if (step === eighthIndex) {
+        this.playCelloNote(midi + STRINGS_PITCH_OFFSET, when, durSteps * stepDuration * 0.95, vel);
+      }
+    }
+
+    // 3. Violin: lyrical lead melody with bowing and delayed vibrato (transposed down)
+    for (const [step, midi, durSteps, vel] of bar.violin) {
+      if (step === eighthIndex) {
+        this.playViolinNote(midi + STRINGS_PITCH_OFFSET, when, durSteps * stepDuration * 0.96, vel);
+      }
+    }
+
+    // 4. Pure string orchestra — NO drums or percussion.
+  }
+
+  private playViolinNote(
+    midi: number,
+    when: number,
+    duration: number,
+    velocity: number,
+  ): void {
+    const ctx = this.ctx;
+    if (!ctx) return;
+
+    const freq = midiToHz(midi);
+    const env = ctx.createGain();
+    const peak = velocity * 0.48;
+
+    // Bowing envelope: smooth attack (bow on string), sustained tone, acoustic ring-out release
+    env.gain.setValueAtTime(0, when);
+    env.gain.linearRampToValueAtTime(peak, when + 0.12);
+    env.gain.setValueAtTime(peak * 0.9, when + duration - 0.06);
+    env.gain.exponentialRampToValueAtTime(0.0001, when + duration + 0.32);
+
+    // Violin body formant shaping: warm low-pass + resonant body peak around 2100Hz
+    const bodyFilter = ctx.createBiquadFilter();
+    bodyFilter.type = 'peaking';
+    bodyFilter.frequency.value = 2100;
+    bodyFilter.Q.value = 1.8;
+    bodyFilter.gain.value = 4.2;
+
+    const lpFilter = ctx.createBiquadFilter();
+    lpFilter.type = 'lowpass';
+    lpFilter.frequency.setValueAtTime(3200, when);
+    lpFilter.frequency.exponentialRampToValueAtTime(1900, when + duration + 0.3);
+
+    env.connect(bodyFilter).connect(lpFilter);
+    // Pan slightly left (quartet 1st violin position) with lush reverb send
+    this.route(lpFilter, this.stringsBus, 0.88, -0.2);
+
+    // Expressive Vibrato: soulful adagio vibrato
+    const vibrato = ctx.createOscillator();
+    vibrato.type = 'sine';
+    vibrato.frequency.value = 4.4; // 4.4 Hz soulful vibrato rate
+    const vibratoGain = ctx.createGain();
+    vibratoGain.gain.setValueAtTime(0, when);
+    vibratoGain.gain.setValueAtTime(0, when + 0.18);
+    vibratoGain.gain.linearRampToValueAtTime(16, when + 0.55); // 16 cents depth
+    vibrato.connect(vibratoGain);
+    vibrato.start(when);
+    vibrato.stop(when + duration + 0.35);
+
+    // Osc 1: Sawtooth (bow string scrape & upper harmonics)
+    const o1 = ctx.createOscillator();
+    o1.type = 'sawtooth';
+    o1.frequency.value = freq;
+    vibratoGain.connect(o1.detune);
+    o1.connect(env);
+    o1.start(when);
+    o1.stop(when + duration + 0.35);
+
+    // Osc 2: Triangle (body depth & warmth, +3 cents detune)
+    const o2 = ctx.createOscillator();
+    o2.type = 'triangle';
+    o2.frequency.value = freq;
+    o2.detune.value = 3;
+    vibratoGain.connect(o2.detune);
+    const g2 = ctx.createGain();
+    g2.gain.value = 0.55;
+    o2.connect(g2).connect(env);
+    o2.start(when);
+    o2.stop(when + duration + 0.35);
+
+    // Osc 3: Gentle sub-harmonic/octave saw (-4 cents detune, lower level)
+    const o3 = ctx.createOscillator();
+    o3.type = 'sawtooth';
+    o3.frequency.value = freq;
+    o3.detune.value = -4;
+    vibratoGain.connect(o3.detune);
+    const g3 = ctx.createGain();
+    g3.gain.value = 0.32;
+    o3.connect(g3).connect(env);
+    o3.start(when);
+    o3.stop(when + duration + 0.35);
+  }
+
+  private playCelloNote(
+    midi: number,
+    when: number,
+    duration: number,
+    velocity: number,
+  ): void {
+    const ctx = this.ctx;
+    if (!ctx) return;
+
+    const freq = midiToHz(midi);
+    const env = ctx.createGain();
+    const peak = velocity * 0.54;
+
+    // Cello bow stroke: heavier attack, rich sustain, resonant acoustic tail
+    env.gain.setValueAtTime(0, when);
+    env.gain.linearRampToValueAtTime(peak, when + 0.14);
+    env.gain.setValueAtTime(peak * 0.92, when + duration - 0.08);
+    env.gain.exponentialRampToValueAtTime(0.0001, when + duration + 0.4);
+
+    // Cello body formant: deep cavity resonance around 280Hz + warm lowpass around 620Hz
+    const cavity = ctx.createBiquadFilter();
+    cavity.type = 'peaking';
+    cavity.frequency.value = 280;
+    cavity.Q.value = 1.6;
+    cavity.gain.value = 5.5;
+
+    const lp = ctx.createBiquadFilter();
+    lp.type = 'lowpass';
+    lp.frequency.setValueAtTime(620, when);
+    lp.frequency.exponentialRampToValueAtTime(340, when + duration + 0.3);
+
+    env.connect(cavity).connect(lp);
+    // Pan slightly right (quartet cello position)
+    this.route(lp, this.stringsBus, 0.78, 0.24);
+
+    // Subtle, slow cello vibrato for notes > 0.5s
+    const vibrato = ctx.createOscillator();
+    vibrato.type = 'sine';
+    vibrato.frequency.value = 3.6;
+    const vibratoGain = ctx.createGain();
+    vibratoGain.gain.setValueAtTime(0, when);
+    if (duration > 0.5) {
+      vibratoGain.gain.setValueAtTime(0, when + 0.22);
+      vibratoGain.gain.linearRampToValueAtTime(9, when + 0.65);
+    }
+    vibrato.connect(vibratoGain);
+    vibrato.start(when);
+    vibrato.stop(when + duration + 0.45);
+
+    // Osc 1: Sawtooth (rasp of horsehair on heavy cello wound strings)
+    const o1 = ctx.createOscillator();
+    o1.type = 'sawtooth';
+    o1.frequency.value = freq;
+    vibratoGain.connect(o1.detune);
+    o1.connect(env);
+    o1.start(when);
+    o1.stop(when + duration + 0.45);
+
+    // Osc 2: Sine (pure deep resonant wood bottom)
+    const o2 = ctx.createOscillator();
+    o2.type = 'sine';
+    o2.frequency.value = freq;
+    vibratoGain.connect(o2.detune);
+    const g2 = ctx.createGain();
+    g2.gain.value = 0.85;
+    o2.connect(g2).connect(env);
+    o2.start(when);
+    o2.stop(when + duration + 0.45);
+
+    // Osc 3: Triangle (warm harmonic body)
+    const o3 = ctx.createOscillator();
+    o3.type = 'triangle';
+    o3.frequency.value = freq;
+    o3.detune.value = 4;
+    vibratoGain.connect(o3.detune);
+    const g3 = ctx.createGain();
+    g3.gain.value = 0.4;
+    o3.connect(g3).connect(env);
+    o3.start(when);
+    o3.stop(when + duration + 0.45);
+  }
+
+  private playStringChord(
+    chord: number[],
+    when: number,
+    duration: number,
+    velocity = 0.8,
+  ): void {
+    const ctx = this.ctx;
+    if (!ctx) return;
+
+    // String ensemble pad: soft bow swell (500ms), sustained warm harmony, slow release
+    const env = ctx.createGain();
+    const peak = 0.046 * velocity;
+    env.gain.setValueAtTime(0, when);
+    env.gain.linearRampToValueAtTime(peak, when + 0.5);
+    env.gain.setValueAtTime(peak, when + duration - 0.35);
+    env.gain.exponentialRampToValueAtTime(0.0001, when + duration + 0.8);
+
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.setValueAtTime(800, when);
+    filter.frequency.exponentialRampToValueAtTime(550, when + duration + 0.6);
+    env.connect(filter);
+    this.route(filter, this.stringsBus, 0.92, 0);
+
+    for (let i = 0; i < chord.length; i++) {
+      const midi = chord[i];
+      const freq = midiToHz(midi);
+
+      // Voice oscillator 1: sawtooth with subtle slow detune
+      const o1 = ctx.createOscillator();
+      o1.type = 'sawtooth';
+      o1.frequency.value = freq;
+      o1.detune.value = (i % 2 === 0 ? 3 : -3);
+
+      const voiceGain = ctx.createGain();
+      voiceGain.gain.value = 0.6;
+      o1.connect(voiceGain).connect(env);
+      o1.start(when);
+      o1.stop(when + duration + 0.8);
+
+      // Voice oscillator 2: warm triangle
+      const o2 = ctx.createOscillator();
+      o2.type = 'triangle';
+      o2.frequency.value = freq;
+      o2.detune.value = (i % 2 === 0 ? -4 : 4);
+      const voiceGain2 = ctx.createGain();
+      voiceGain2.gain.value = 0.45;
+      o2.connect(voiceGain2).connect(env);
+      o2.start(when);
+      o2.stop(when + duration + 0.8);
     }
   }
 

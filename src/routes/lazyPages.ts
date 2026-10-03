@@ -9,3 +9,4 @@ export const SubsoloPage = lazy(() => import('../components/SubsoloPage.tsx').th
 export const XxxxPage = lazy(() => import('../components/XxxxPage.tsx').then(m => ({ default: m.XxxxPage })));
 export const IrisPage = lazy(() => import('../components/IrisPage.tsx').then(m => ({ default: m.IrisPage })));
 export const SilencioPage = lazy(() => import('../components/SilencioPage.tsx').then(m => ({ default: m.SilencioPage })));
+export const TrevasPage = lazy(() => import('../components/TrevasPage.tsx').then(m => ({ default: m.TrevasPage })));

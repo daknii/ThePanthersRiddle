@@ -15,6 +15,7 @@ import {
   XxxxPage,
   IrisPage,
   SilencioPage,
+  TrevasPage,
 } from './routes/lazyPages.ts'
 
 createRoot(document.getElementById('root')!).render(
@@ -39,6 +40,8 @@ createRoot(document.getElementById('root')!).render(
           <Route path="/IRIS" element={<IrisPage />} />
           <Route path="/silencio" element={<SilencioPage />} />
           <Route path="/SILENCIO" element={<SilencioPage />} />
+          <Route path="/trevas" element={<TrevasPage />} />
+          <Route path="/TREVAS" element={<TrevasPage />} />
         </Routes>
       </Suspense>
       </AudioGate>

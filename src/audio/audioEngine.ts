@@ -36,6 +36,7 @@ const ROUTE_MOODS: Record<string, MusicMood> = {
   '/xxxx': 'deep',
   '/iris': 'hunt',
   '/silencio': 'deep',
+  '/trevas': 'deep',
 };
 
 export function moodForPath(pathname: string): MusicMood | null {
@@ -363,6 +364,58 @@ class AudioEngine {
       noise.start(t);
       noise.stop(t + 2.7);
     }
+  }
+
+  playAmbushStrike(): void {
+    const ctx = this.running();
+    if (!ctx) return;
+    const t = ctx.currentTime;
+
+    // 1. Massive low impact thump (predator pounce)
+    const boom = ctx.createOscillator();
+    boom.type = 'sine';
+    boom.frequency.setValueAtTime(110, t);
+    boom.frequency.exponentialRampToValueAtTime(24, t + 1.2);
+    const boomEnv = ctx.createGain();
+    boomEnv.gain.setValueAtTime(0, t);
+    boomEnv.gain.linearRampToValueAtTime(1.0, t + 0.005);
+    boomEnv.gain.exponentialRampToValueAtTime(0.0001, t + 1.8);
+    boom.connect(boomEnv).connect(this.sfxBus);
+    boom.start(t);
+    boom.stop(t + 1.9);
+
+    // 2. High-speed claw shred / slash noise
+    if (this.noiseBuffer) {
+      const slash = ctx.createBufferSource();
+      slash.buffer = this.noiseBuffer;
+      const slashFilter = ctx.createBiquadFilter();
+      slashFilter.type = 'highpass';
+      slashFilter.frequency.setValueAtTime(1800, t);
+      slashFilter.frequency.exponentialRampToValueAtTime(450, t + 0.35);
+
+      const slashEnv = ctx.createGain();
+      slashEnv.gain.setValueAtTime(0, t);
+      slashEnv.gain.linearRampToValueAtTime(0.85, t + 0.01);
+      slashEnv.gain.exponentialRampToValueAtTime(0.0001, t + 0.5);
+
+      slash.connect(slashFilter).connect(slashEnv);
+      this.route(slashEnv, this.sfxBus, 0.9);
+      slash.start(t);
+      slash.stop(t + 0.55);
+    }
+
+    // 3. Bone snap / vicious bite click
+    const snap = ctx.createOscillator();
+    snap.type = 'triangle';
+    snap.frequency.setValueAtTime(1200, t);
+    snap.frequency.exponentialRampToValueAtTime(80, t + 0.08);
+    const snapEnv = ctx.createGain();
+    snapEnv.gain.setValueAtTime(0, t);
+    snapEnv.gain.linearRampToValueAtTime(0.7, t + 0.002);
+    snapEnv.gain.exponentialRampToValueAtTime(0.0001, t + 0.1);
+    snap.connect(snapEnv).connect(this.sfxBus);
+    snap.start(t);
+    snap.stop(t + 0.12);
   }
 
   playStinger(kind: Stinger): void {

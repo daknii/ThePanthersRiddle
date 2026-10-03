@@ -641,109 +641,72 @@ export const IrisPage: React.FC = () => {
           </div>
         </div>
 
-        {/* SLEEK ANALOG RADIO FREQUENCY TUNER */}
+        {/* MINIMALIST RADIO FREQUENCY SLIDER */}
         <div
           ref={tunerRef}
           onWheel={(e) => {
             e.preventDefault();
             handleFrequencyChange(frequency + (e.deltaY > 0 ? -0.1 : 0.1));
           }}
-          className="relative max-w-lg w-full p-4 sm:p-5 rounded-lg border border-[#3b0a0e]/80 bg-[#090305]/85 backdrop-blur-md shadow-[0_0_40px_rgba(0,0,0,0.9),inset_0_0_25px_rgba(153,0,17,0.1)] flex flex-col items-center"
+          className="relative max-w-md w-full flex flex-col items-center mt-2 select-none"
           style={{ opacity: 0 }}
         >
-          {/* Header readout */}
-          <div className="w-full flex items-center justify-between border-b border-[#290509]/80 pb-2.5 mb-3">
-            <span className="font-mono text-[10px] tracking-[0.3em] text-[#705055] uppercase">
-              RECEPÇÃO DE FREQUÊNCIA // 80 - 100 MHz
+          {/* Frequency Display */}
+          <div className="flex items-baseline gap-1.5 mb-5 pointer-events-none">
+            <span className="font-mono text-3xl sm:text-4xl font-bold text-[#e6001a] tracking-widest drop-shadow-[0_0_15px_rgba(230,0,26,0.8)]">
+              {frequency.toFixed(1)}
             </span>
-
-            <div className="flex items-baseline gap-1.5 bg-[#050102] px-3 py-1 rounded border border-[#3b0a0e]/60">
-              <span className="font-mono text-xl sm:text-2xl font-black text-[#e6001a] tracking-wider drop-shadow-[0_0_8px_rgba(230,0,26,0.7)]">
-                {frequency.toFixed(1)}
-              </span>
-              <span className="font-mono text-[10px] text-[#705055] tracking-widest uppercase">
-                MHz
-              </span>
-            </div>
+            <span className="font-mono text-xs text-[#8f7579] tracking-widest uppercase">
+              MHz
+            </span>
           </div>
 
-          {/* Analog Glass Frequency Scale */}
+          {/* Minimalist Interactive Slider Line */}
           <div
             ref={scaleTrackRef}
             onPointerDown={handlePointerDown}
             onPointerMove={handlePointerMove}
             onPointerUp={handlePointerUp}
-            className="relative w-full h-14 sm:h-16 bg-[#060203] rounded border border-[#2e070c] shadow-[inset_0_3px_10px_rgba(0,0,0,0.95)] overflow-hidden cursor-ew-resize touch-none select-none flex flex-col justify-between py-1.5 px-3"
-            title="Arraste para sintonizar a frequência ou use a rodinha do mouse / setas do teclado"
+            className="relative w-full h-10 flex items-center cursor-ew-resize touch-none"
+            title="Arraste para sintonizar ou use a rodinha do mouse / setas do teclado"
           >
-            {/* Tick Marks */}
-            <div className="w-full flex justify-between items-end h-6 border-b border-[#29070a]/60 pb-1 pointer-events-none">
-              {[80, 82, 84, 86, 88, 90, 92, 94, 96, 98, 100].map((val) => (
-                <div key={val} className="flex flex-col items-center">
-                  <div className={`w-[1px] ${val % 4 === 0 ? 'h-3 bg-[#54121b]' : 'h-2 bg-[#330b11]'}`} />
-                  <span className="font-mono text-[9px] text-[#5c3e42] mt-0.5 select-none">
-                    {val}
-                  </span>
-                </div>
+            {/* Horizontal Track Line */}
+            <div className="w-full h-[1px] bg-gradient-to-r from-transparent via-[#4a1017] to-transparent relative">
+              {/* Subtle ticks */}
+              {[80, 85, 90, 95, 100].map((val) => (
+                <div
+                  key={val}
+                  className="absolute top-1/2 -translate-y-1/2 w-[1px] h-2 bg-[#4a1017] pointer-events-none"
+                  style={{
+                    left: `${((val - MIN_FREQ) / (MAX_FREQ - MIN_FREQ)) * 100}%`,
+                  }}
+                />
               ))}
             </div>
 
-            {/* Glowing Red Needle */}
+            {/* Glowing Red Needle / Thumb */}
             <div
-              className="absolute top-0 bottom-0 w-[2px] bg-[#ff1a38] pointer-events-none transition-all duration-75 shadow-[0_0_8px_#ff0026]"
+              className="absolute top-1/2 -translate-y-1/2 pointer-events-none transition-transform duration-75"
               style={{
                 left: `${((frequency - MIN_FREQ) / (MAX_FREQ - MIN_FREQ)) * 100}%`,
               }}
             >
-              <div className="w-2.5 h-2.5 -ml-1 rounded-full bg-[#ff1a38] shadow-[0_0_10px_#ff0026]" />
+              <div
+                className={`w-3.5 h-3.5 -ml-[7px] rounded-full border border-[#ff4d66] bg-[#e6001a] transition-all duration-200 ${
+                  holdProgress > 0
+                    ? 'scale-125 shadow-[0_0_20px_#ff0026]'
+                    : 'shadow-[0_0_10px_#ff0026]'
+                }`}
+              />
             </div>
           </div>
 
-          {/* Controls & Resonance Meter */}
-          <div className="w-full flex items-center justify-between gap-3 mt-3">
-            <div className="flex items-center gap-1.5">
-              <button
-                type="button"
-                onClick={() => handleFrequencyChange(frequency - 0.1)}
-                disabled={isRoaring}
-                className="px-2.5 py-1 rounded bg-[#120406] hover:bg-[#24080c] text-[#ded3d5] font-mono text-[11px] border border-[#2e070c] hover:border-[#990011] transition-colors disabled:opacity-30 cursor-pointer"
-                title="Ajuste fino -0.1 MHz"
-              >
-                ◀ -0.1
-              </button>
-              <button
-                type="button"
-                onClick={() => handleFrequencyChange(frequency + 0.1)}
-                disabled={isRoaring}
-                className="px-2.5 py-1 rounded bg-[#120406] hover:bg-[#24080c] text-[#ded3d5] font-mono text-[11px] border border-[#2e070c] hover:border-[#990011] transition-colors disabled:opacity-30 cursor-pointer"
-                title="Ajuste fino +0.1 MHz"
-              >
-                +0.1 ▶
-              </button>
-            </div>
-
-            {/* Resonance Progress */}
-            <div className="flex flex-col items-end">
-              <div className="flex items-center gap-2">
-                <span className="font-mono text-[9px] sm:text-[10px] tracking-[0.2em] text-[#705055] uppercase">
-                  RESSONÂNCIA:
-                </span>
-                <span
-                  className={`font-mono text-xs font-bold ${
-                    holdProgress > 0 ? 'text-[#e6001a]' : 'text-[#4d2d31]'
-                  }`}
-                >
-                  {Math.round(holdProgress * 100)}%
-                </span>
-              </div>
-
-              <div className="w-36 sm:w-44 h-1.5 rounded-full bg-[#050102] border border-[#2e070c] overflow-hidden mt-1">
-                <div
-                  className="h-full bg-gradient-to-r from-[#990011] to-[#ff1a38] transition-all duration-75 shadow-[0_0_8px_#e6001a]"
-                  style={{ width: `${holdProgress * 100}%` }}
-                />
-              </div>
-            </div>
+          {/* Minimal Resonance Charge Line */}
+          <div className="w-36 sm:w-48 h-[2px] bg-[#1a0508] rounded-full overflow-hidden mt-3">
+            <div
+              className="h-full bg-gradient-to-r from-[#990011] to-[#ff1a38] transition-all duration-75 shadow-[0_0_10px_#e6001a]"
+              style={{ width: `${holdProgress * 100}%` }}
+            />
           </div>
         </div>
       </main>

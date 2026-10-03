@@ -10,16 +10,6 @@ interface PantherEyesProps {
   onEyesRevealed?: () => void;
 }
 
-/**
- * Component: PantherEyes
- * Renders hyper-realistic red panther (feline) eyes peering out of the deep void (#050303).
- * Key behaviors:
- * - Subtle cursor tracking: ONLY the black feline slit pupils glide smoothly.
- * - Slower, silky smooth eyelid transitions for organic, lifelike blinks.
- * - Deep, clean slow close upon click resolution.
- * - Target Lock: When inside the target, blinking STOPS and a vivid glowing red signal flares in both eyes.
- * - Iris striations and tapetum lucidum subtle glow.
- */
 export const PantherEyes: React.FC<PantherEyesProps> = ({
   cursor,
   blinkState,
@@ -62,7 +52,6 @@ export const PantherEyes: React.FC<PantherEyesProps> = ({
     }
   }, [onEyesRevealed]);
 
-  // Final proximity state: target area found
   const isInside = proximityState === 'INSIDE_TARGET';
 
   // Dynamic eyelid transition duration based on state
@@ -195,7 +184,7 @@ export const PantherEyes: React.FC<PantherEyesProps> = ({
               {/* Deep Void Core */}
               <ellipse cx="120" cy="60" rx="3.5" ry="16" fill="#000000" />
 
-              {/* RED SIGNAL EMITTER (Active only when cursor finds the target area) */}
+              {/* Visual FX */}
               <g
                 className={`red-signal-group transition-all duration-300 ${
                   isInside ? 'opacity-100 scale-100' : 'opacity-0 scale-50 pointer-events-none'
@@ -432,7 +421,7 @@ export const PantherEyes: React.FC<PantherEyesProps> = ({
               />
               <ellipse cx="120" cy="60" rx="3.5" ry="16" fill="#000000" />
 
-              {/* RED SIGNAL EMITTER (Active only when cursor finds the target area) */}
+              {/* Visual FX */}
               <g
                 className={`red-signal-group transition-all duration-300 ${
                   isInside ? 'opacity-100 scale-100' : 'opacity-0 scale-50 pointer-events-none'

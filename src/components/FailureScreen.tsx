@@ -1,16 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { createTimeline } from 'animejs';
 
-/**
- * Component: FailureScreen
- * Displayed when user clicks outside the invisible target:
- * Displays:
- * "FALSO."
- * "Você foi pego pela presa."
- * "Comece outra vez."
- * Locks the puzzle permanently until page refresh.
- * Uses a slow, eerie, clean staggered reveal with Anime.js v4.
- */
 export const FailureScreen: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLHeadingElement>(null);

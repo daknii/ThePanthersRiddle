@@ -8,14 +8,6 @@ interface UseBlinkManagerProps {
   enabled?: boolean;
 }
 
-/**
- * Custom Hook: Blink State Management
- * Dynamically accelerates blinking frequency as the user approaches the hidden target:
- * - FAR: Infrequent, slow feline double-blinks (~3.5s - 5s).
- * - CLOSER: Blinking intervals progressively speed up (3s -> 1.8s -> 900ms -> 450ms).
- * - VERY CLOSE: Rapid alternating ping-pong flutter (~200ms - 300ms).
- * - INSIDE TARGET: Complete freeze! All blinking STOPS immediately, eyes lock wide open.
- */
 export function useBlinkManager({
   proximityState,
   distance = Infinity,
@@ -34,7 +26,6 @@ export function useBlinkManager({
   const enabledRef = useRef(enabled);
   const forceClosedRef = useRef(forceClosed);
 
-  // Keep refs synchronized
   useEffect(() => {
     distanceRef.current = distance;
     proximityRef.current = proximityState;
@@ -84,7 +75,6 @@ export function useBlinkManager({
       return;
     }
 
-    // TARGET FOUND: STOP ALL BLINKING IMMEDIATELY!
     if (proximityState === 'INSIDE_TARGET') {
       const openTimer = window.setTimeout(() => {
         setBlinkState({ leftEyeClosed: false, rightEyeClosed: false });
@@ -93,7 +83,6 @@ export function useBlinkManager({
       return;
     }
 
-    // Dynamic Progressive Blinking Loop
     let isCancelled = false;
 
     const scheduleNextBlink = () => {
@@ -105,33 +94,20 @@ export function useBlinkManager({
 
       const currentDist = distanceRef.current;
       const maxDistance = 500;
-      const minDistance = 58; // Target hit radius
+      const minDistance = 58;
       const clampedDist = Math.max(minDistance, Math.min(maxDistance, currentDist));
-      const factor = (clampedDist - minDistance) / (maxDistance - minDistance); // 0 (at edge) to 1 (far)
+      const factor = (clampedDist - minDistance) / (maxDistance - minDistance);
 
-      // Frequency calculation:
-      // factor = 1.0 (far): ~3600ms
-      // factor = 0.5 (mid): ~1400ms
-      // factor = 0.2 (close): ~550ms
-      // factor = 0.05 (very close edge): ~220ms
       const delay = Math.round(180 + Math.pow(factor, 1.35) * 3400);
-
-      // Blink closing duration:
-      // When far: 240ms (slow, organic blink)
-      // When near: 100ms (rapid, nervous twitch)
       const duration = Math.round(95 + Math.pow(factor, 1.2) * 145);
 
-      // Eye mode selection:
       let eyeToBlink: 'left' | 'right' | 'both';
       if (factor > 0.65) {
-        // Far away: predominantly slow double blinks
         eyeToBlink = Math.random() < 0.75 ? 'both' : (Math.random() < 0.5 ? 'left' : 'right');
       } else if (factor > 0.25) {
-        // Getting closer: asynchronous alternating wink
         eyeToBlink = nextEyeRef.current;
         nextEyeRef.current = nextEyeRef.current === 'left' ? 'right' : 'left';
       } else {
-        // Very close: rapid alternating ping-pong flutter
         eyeToBlink = nextEyeRef.current;
         nextEyeRef.current = nextEyeRef.current === 'left' ? 'right' : 'left';
       }
@@ -145,20 +121,18 @@ export function useBlinkManager({
       activeTimersRef.current.push(timerId);
     };
 
-    // Initial kick-off with a responsive short delay
-    const initialDelay = proximityState === 'VERY_CLOSE' ? 120 : proximityState === 'CLOSER' ? 300 : 800;
-    const startTimer = window.setTimeout(() => {
+    const kickOffDelay = proximityState === 'FAR' ? 1400 : 350;
+    const kickOffTimer = window.setTimeout(() => {
       scheduleNextBlink();
-    }, initialDelay);
-    activeTimersRef.current.push(startTimer);
+    }, kickOffDelay);
+
+    activeTimersRef.current.push(kickOffTimer);
 
     return () => {
       isCancelled = true;
       clearAllTimers();
     };
-  }, [proximityState, distance, forceClosed, enabled, blinkEye, clearAllTimers]);
+  }, [proximityState, enabled, forceClosed, clearAllTimers, blinkEye]);
 
-  return {
-    blinkState: forceClosed ? { leftEyeClosed: true, rightEyeClosed: true } : blinkState,
-  };
+  return { blinkState };
 }

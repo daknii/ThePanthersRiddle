@@ -1,32 +1,20 @@
 import React, { useEffect, useRef } from 'react';
 import { createTimeline } from 'animejs';
 
-export const FlorestaPage: React.FC = () => {
+export const SubsoloPage: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const tagRef = useRef<HTMLSpanElement>(null);
   const titleRef = useRef<HTMLHeadingElement>(null);
   const subtitleRef = useRef<HTMLParagraphElement>(null);
-  const promptRef = useRef<HTMLParagraphElement>(null);
-  const hasLoggedRef = useRef(false);
-
-  useEffect(() => {
-    if (hasLoggedRef.current) return;
-    hasLoggedRef.current = true;
-
-    console.log(
-      '%c[A FLORESTA]\n\n%cJUJRFLW',
-      'color: #e6001a; font-family: monospace; font-size: 14px; font-weight: bold; letter-spacing: 0.15em;',
-      'color: #ded3d5; font-family: monospace; font-size: 16px; font-weight: bold; letter-spacing: 0.25em;'
-    );
-  }, []);
+  const placeholderNoteRef = useRef<HTMLParagraphElement>(null);
 
   useEffect(() => {
     const containerEl = containerRef.current;
     const tagEl = tagRef.current;
     const titleEl = titleRef.current;
     const subtitleEl = subtitleRef.current;
-    const promptEl = promptRef.current;
-    if (!containerEl || !tagEl || !titleEl || !subtitleEl || !promptEl) return;
+    const placeholderNoteEl = placeholderNoteRef.current;
+    if (!containerEl || !tagEl || !titleEl || !subtitleEl || !placeholderNoteEl) return;
 
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -35,7 +23,7 @@ export const FlorestaPage: React.FC = () => {
       tagEl.style.opacity = '1';
       titleEl.style.opacity = '1';
       subtitleEl.style.opacity = '1';
-      promptEl.style.opacity = '1';
+      placeholderNoteEl.style.opacity = '1';
       return;
     }
 
@@ -45,43 +33,42 @@ export const FlorestaPage: React.FC = () => {
     titleEl.style.filter = 'blur(16px)';
     subtitleEl.style.opacity = '0';
     subtitleEl.style.filter = 'blur(12px)';
-    promptEl.style.opacity = '0';
-    promptEl.style.filter = 'blur(10px)';
+    placeholderNoteEl.style.opacity = '0';
+    placeholderNoteEl.style.filter = 'blur(8px)';
 
     const timeline = createTimeline();
 
     timeline
       .add(containerEl, {
         opacity: [0, 1],
-        duration: 1200,
+        duration: 1400,
         ease: 'inOutCubic',
       }, 0)
       .add(tagEl, {
-        opacity: [0, 0.85],
-        duration: 1800,
+        opacity: [0, 0.9],
+        duration: 2200,
         ease: 'inOutCubic',
-      }, 300)
+      }, 400)
       .add(titleEl, {
         opacity: [0, 1],
         filter: ['blur(16px)', 'blur(0px)'],
-        translateY: [24, 0],
+        translateY: [26, 0],
         duration: 3200,
         ease: 'inOutCubic',
-      }, 600)
+      }, 700)
       .add(subtitleEl, {
         opacity: [0, 0.85],
         filter: ['blur(12px)', 'blur(0px)'],
-        translateY: [14, 0],
+        translateY: [12, 0],
         duration: 2800,
         ease: 'inOutCubic',
-      }, 2000)
-      .add(promptEl, {
-        opacity: [0, 1],
-        filter: ['blur(10px)', 'blur(0px)'],
-        translateY: [10, 0],
+      }, 2200)
+      .add(placeholderNoteEl, {
+        opacity: [0, 0.5],
+        filter: ['blur(8px)', 'blur(0px)'],
         duration: 2400,
         ease: 'inOutCubic',
-      }, 3400);
+      }, 3800);
   }, []);
 
   return (
@@ -89,26 +76,28 @@ export const FlorestaPage: React.FC = () => {
       ref={containerRef}
       className="relative w-screen h-screen min-h-screen bg-[#050303] text-[#e0d6d8] overflow-hidden select-none cursor-default flex flex-col items-center justify-center px-6 sm:px-12"
       style={{ opacity: 0 }}
-      aria-label="A Floresta — Fase 4 do Enigma"
+      aria-label="Ecos do Subsolo — Fase 5 do Enigma"
     >
+      {/* Atmospheric Layers */}
       <div className="vignette-crimson" aria-hidden="true" />
       <div className="noise-overlay" aria-hidden="true" />
 
+      {/* Main Content Cluster */}
       <main className="relative z-20 flex flex-col items-center text-center max-w-2xl gap-5">
         <span
           ref={tagRef}
           className="font-mono text-xs tracking-[0.35em] text-[#990011] uppercase block mb-1 pointer-events-none"
           style={{ opacity: 0 }}
         >
-          LIMIAR IV • FASE 4
+          LIMIAR V • FASE 5
         </span>
 
         <h1
           ref={titleRef}
-          className="font-serif text-3xl sm:text-5xl md:text-6xl font-black tracking-[0.26em] text-[#990011] drop-shadow-[0_0_35px_rgba(230,0,26,0.6)] uppercase"
+          className="font-serif text-3xl sm:text-5xl md:text-6xl font-black tracking-[0.24em] text-[#990011] drop-shadow-[0_0_35px_rgba(230,0,26,0.6)] uppercase"
           style={{ opacity: 0 }}
         >
-          A FLORESTA.
+          ECOS DO SUBSOLO
         </h1>
 
         <p
@@ -116,20 +105,16 @@ export const FlorestaPage: React.FC = () => {
           className="font-mono text-xs sm:text-sm md:text-base tracking-[0.16em] text-[#8f8083] italic"
           style={{ opacity: 0 }}
         >
-          As raízes estão abaixo.
+          As raízes deram lugar à escuridão da terra profunda.
         </p>
 
         <p
-          ref={promptRef}
-          className="font-mono text-sm sm:text-base md:text-lg tracking-[0.24em] text-[#b30018] font-bold mt-4 select-text drop-shadow-[0_0_15px_rgba(230,0,26,0.4)]"
+          ref={placeholderNoteRef}
+          className="font-mono text-[11px] sm:text-xs text-[#5c4e51] tracking-[0.22em] uppercase italic mt-6 pointer-events-none"
           style={{ opacity: 0 }}
         >
-          &gt; procure
+          [ Espaço reservado para a próxima fase do enigma ]
         </p>
-
-        <div hidden style={{ display: 'none' }} aria-hidden="true">
-          UkFJWg==
-        </div>
       </main>
     </div>
   );

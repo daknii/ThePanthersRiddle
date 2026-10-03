@@ -1,17 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { createTimeline } from 'animejs';
 
-/**
- * Component: KlvnzPage
- * The red herring / hint page accessible at /klvnz.
- * Content:
- * - "KLVNZ." in crimson
- * - "Ainda estás a olhar para as palavras trocadas." in subdued gray
- * - "A↔️Z" as the core Atbash cipher hint
- *
- * Uses the same atmospheric Anime.js v4 reveal and design tokens
- * as all other Enigma Antirian pages.
- */
 export const KlvnzPage: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLHeadingElement>(null);
@@ -46,13 +35,11 @@ export const KlvnzPage: React.FC = () => {
     const timeline = createTimeline();
 
     timeline
-      // Container emergence from pure darkness
       .add(containerEl, {
         opacity: [0, 1],
         duration: 1400,
         ease: 'inOutCubic',
       }, 0)
-      // "KLVNZ." — heavy, imposing title
       .add(titleEl, {
         opacity: [0, 1],
         filter: ['blur(18px)', 'blur(0px)'],
@@ -60,7 +47,6 @@ export const KlvnzPage: React.FC = () => {
         duration: 3400,
         ease: 'inOutCubic',
       }, 500)
-      // "Ainda estás a olhar para as palavras trocadas."
       .add(hintEl, {
         opacity: [0, 0.8],
         filter: ['blur(12px)', 'blur(0px)'],
@@ -68,7 +54,6 @@ export const KlvnzPage: React.FC = () => {
         duration: 2800,
         ease: 'inOutCubic',
       }, 2400)
-      // "A↔️Z" — the Atbash cipher key, last and prominent
       .add(cipherEl, {
         opacity: [0, 1],
         filter: ['blur(14px)', 'blur(0px)'],
@@ -85,11 +70,9 @@ export const KlvnzPage: React.FC = () => {
       style={{ opacity: 0 }}
       aria-label="KLVNZ — Enigma Antirian"
     >
-      {/* Atmospheric Layers */}
       <div className="vignette-crimson" aria-hidden="true" />
       <div className="noise-overlay" aria-hidden="true" />
 
-      {/* Content — Vertically centered cluster */}
       <div className="relative z-20 flex flex-col items-center text-center max-w-2xl gap-6">
         <h1
           ref={titleRef}

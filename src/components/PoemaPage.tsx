@@ -12,13 +12,6 @@ const VERSES = [
   "Apareça, pantera.",
 ];
 
-/**
- * Component: PoemaPage
- * Page: /poema
- * Displays the dark riddle poem "Pantera", whose verses form the acrostic "FLORESTA".
- * Features Anime.js v4 staggered verse reveal, atmospheric lighting,
- * and selectable crimson-highlighted typography.
- */
 export const PoemaPage: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const tagRef = useRef<HTMLSpanElement>(null);

@@ -10,7 +10,6 @@ interface UseProximityProps {
 export function useProximityCalculation({ cursor, config = PUZZLE_CONFIG }: UseProximityProps) {
   const [targetCoords, setTargetCoords] = useState(() => getTargetPixelCoordinates(config));
 
-  // Keep target pixel coordinates updated on window resize
   useEffect(() => {
     const handleResize = () => {
       setTargetCoords(getTargetPixelCoordinates(config));

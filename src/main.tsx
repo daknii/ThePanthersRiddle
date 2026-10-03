@@ -47,6 +47,7 @@ createRoot(document.getElementById('root')!).render(
           <Route path="/ETERNO" element={<Navigate to="/trevas" replace />} />
           <Route path="/climax" element={<EternoPage />} />
           <Route path="/CLIMAX" element={<EternoPage />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Suspense>
       </AudioGate>
